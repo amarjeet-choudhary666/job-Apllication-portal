@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { jobAPI } from '../services/api';
+import { motion } from 'framer-motion';
 
 interface AppliedJob {
   _id: string;
@@ -48,51 +49,84 @@ const AppliedJobs: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="text-center py-8">Loading your applications...</div>;
+    return (
+      <div className="flex justify-center items-center py-12">
+        <motion.div
+          className="w-16 h-16 bg-blue-500 rounded-full"
+          animate={{ scale: [1, 1.3, 1] }}
+          transition={{ duration: 1.2, repeat: Infinity }}
+        />
+      </div>
+    );
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">My Applied Jobs</h1>
+      <motion.h1
+        className="text-4xl font-bold text-center text-gray-800 mb-10"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        My Applied Jobs
+      </motion.h1>
 
       {appliedJobs.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
+        <motion.div
+          className="text-center py-12 text-gray-500"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
           You haven't applied to any jobs yet.
-        </div>
+        </motion.div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {appliedJobs.map((job) => (
-            <div key={job._id} className="border rounded-lg p-4 shadow-md">
-              <h3 className="text-xl font-semibold mb-2">{job.title}</h3>
-              <p className="text-gray-600 mb-2">{job.description}</p>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {job.skills.map((skill, index) => (
-                  <span
-                    key={index}
-                    className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm"
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {appliedJobs.map((job, index) => (
+            <motion.div
+              key={job._id}
+              className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 cursor-pointer"
+              whileHover={{ scale: 1.03, boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1, duration: 0.4 }}
+            >
+              <h3 className="text-xl font-semibold text-gray-800 mb-3">{job.title}</h3>
+              <p className="text-gray-600 text-sm mb-4 line-clamp-3">{job.description}</p>
+
+              <div className="flex flex-wrap gap-2 mb-4">
+                {job.skills.map((skill, idx) => (
+                  <motion.span
+                    key={idx}
+                    className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium"
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
                   >
                     {skill}
-                  </span>
+                  </motion.span>
                 ))}
               </div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-lg font-bold text-green-600">${job.salary}</span>
-                <span className="text-gray-500">{job.location}</span>
+
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-lg font-bold text-green-600">${job.salary.toLocaleString()}</span>
+                <span className="text-gray-500 text-sm">{job.location}</span>
               </div>
-              <p className="text-sm text-gray-500 mb-2">
-                Posted by: {job.employer.name}
+
+              <p className="text-gray-500 text-xs mb-4">
+                Employer: <span className="font-medium text-gray-700">{job.employer.name}</span>
               </p>
+
               <div className="flex justify-between items-center">
                 <span
-                  className={`px-2 py-1 rounded text-sm font-medium ${getStatusColor(job.status)}`}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(job.status)}`}
                 >
                   {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
                 </span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-400">
                   Applied: {new Date(job.appliedAt).toLocaleDateString()}
                 </span>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       )}
